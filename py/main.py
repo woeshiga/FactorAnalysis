@@ -3,58 +3,56 @@ from sklearn.decomposition import FactorAnalysis
 import tkinter as tk
 from tkinter import messagebox, filedialog
 
-def perform_factor_analysis():
-    try:
-        # Чтение входных данных из текстовых полей
-        num_samples = int(entry_samples.get())
-        num_features = int(entry_features.get())
-        max_factors = int(entry_max_factors.get())
+class FactorAnalysisApp:
+    def __init__(self):
+        self.window = tk.Tk()
+        self.window.title("Факторный анализ")
+        self.window.geometry("500x500")
+        self.create_widgets()
 
-        # Загрузка данных из файла
-        file_path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
-        if not file_path:
-            return
+    def create_widgets(self):
+        label_samples = tk.Label(self.window, text="Количество сэмплов:")
+        label_samples.pack()
+        self.entry_samples = tk.Entry(self.window)
+        self.entry_samples.pack()
 
-        # Чтение данных из файла
-        data = np.genfromtxt(file_path, delimiter=',')  # Предполагается, что файл CSV содержит только числовые данные
-        X = data[:num_samples, :num_features]
+        label_features = tk.Label(self.window, text="Количество признаков:")
+        label_features.pack()
+        self.entry_features = tk.Entry(self.window)
+        self.entry_features.pack()
 
-        # Факторный анализ
-        fa = FactorAnalysis(n_components=max_factors, random_state=0)
-        X_factors = fa.fit_transform(X)
+        label_max_factors = tk.Label(self.window, text="Максимальное количество факторов:")
+        label_max_factors.pack()
+        self.entry_max_factors = tk.Entry(self.window)
+        self.entry_max_factors.pack()
 
-        # Вывод результатов
-        messagebox.showinfo("Результаты", f"Матрица факторных нагрузок:\n{fa.components_}\n\nМатрица факторных значений:\n{X_factors}")
+        button_analyze = tk.Button(self.window, text="Выполнить факторный анализ", command=self.perform_factor_analysis)
+        button_analyze.pack()
 
-    except ValueError:
-        messagebox.showerror("Ошибка", "Пожалуйста, введите корректные числовые значения")
+    def perform_factor_analysis(self):
+        try:
+            num_samples = int(self.entry_samples.get())
+            num_features = int(self.entry_features.get())
+            max_factors = int(self.entry_max_factors.get())
 
-# Создание графического интерфейса с использованием Tkinter
-window = tk.Tk()
-window.title("Факторный анализ")
-window.geometry("500x500")
+            file_path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
+            if not file_path:
+                return
 
-# Метка и текстовое поле для количества сэмплов
-label_samples = tk.Label(window, text="Количество сэмплов:")
-label_samples.pack()
-entry_samples = tk.Entry(window)
-entry_samples.pack()
+            data = np.genfromtxt(file_path, delimiter=',')
+            X = data[:num_samples, :num_features]
 
-# Метка и текстовое поле для количества признаков
-label_features = tk.Label(window, text="Количество признаков:")
-label_features.pack()
-entry_features = tk.Entry(window)
-entry_features.pack()
+            fa = FactorAnalysis(n_components=max_factors, random_state=0)
+            X_factors = fa.fit_transform(X)
 
-# Метка и текстовое поле для максимального количества факторов
-label_max_factors = tk.Label(window, text="Максимальное количество факторов:")
-label_max_factors.pack()
-entry_max_factors = tk.Entry(window)
-entry_max_factors.pack()
+            messagebox.showinfo("Результаты", f"Матрица факторных нагрузок:\n{fa.components_}\n\nМатрица факторных значений:\n{X_factors}")
 
-# Кнопка для запуска факторного анализа
-button_analyze = tk.Button(window, text="Выполнить факторный анализ", command=perform_factor_analysis)
-button_analyze.pack()
+        except ValueError:
+            messagebox.showerror("Ошибка", "Пожалуйста, введите корректные числовые значения")
 
-# Запуск главного цикла графического интерфейса
-window.mainloop()
+    def run(self):
+        self.window.mainloop()
+
+if __name__ == "__main__":
+    app = FactorAnalysisApp()
+    app.run()
